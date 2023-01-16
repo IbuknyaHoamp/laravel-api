@@ -45,4 +45,9 @@ class PostController extends Controller
         // kembalikan status data dan message
         return new PostResource(true, 'Data berhasil ditambahkan', $post);
     }
+
+    public function show(Post $post){
+        // kembalikan data single post
+        return new PostResource(true, 'Data post ditemukan!', $post);
+    }
 }
