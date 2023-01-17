@@ -86,6 +86,7 @@ class PostController extends Controller
             ]);
         }
 
+        // kembalikan response
         return new PostResource(true, "Data berhasil di update", $post);
     }
 
