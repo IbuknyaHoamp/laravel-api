@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Post;
 use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class PostController extends Controller
@@ -49,5 +50,42 @@ class PostController extends Controller
     public function show(Post $post){
         // kembalikan data single post
         return new PostResource(true, 'Data post ditemukan!', $post);
+    }
+
+    public function update(Request $request, Post $post){
+        // validasi inputan 
+        $validator = Validator::make($request->all(), [
+            'title'     => 'required',
+            'content'   => 'required',
+        ]);
+
+        //check if validation fails
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        // cek jika ada gambar
+        if($request->hasFile('image')){
+            // upload gambar
+            $image = $request->file('image');
+            $image->storeAs('public/posts', $image->hashName());
+
+            // hapus gambar lama
+            Storage::delete('public/posts/' . $post->image);
+
+            // update data
+            $post->update([
+                'image' => $image->hashName(),
+                'title' => $request->title,
+                'content' => $request->content
+            ]);
+        } else {
+            $post->update([
+                'title' => $request->title,
+                'content' => $request->content
+            ]);
+        }
+
+        return new PostResource(true, "Data berhasil di update", $post);
     }
 }
