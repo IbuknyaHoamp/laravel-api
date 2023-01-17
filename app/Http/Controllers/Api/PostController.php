@@ -59,7 +59,7 @@ class PostController extends Controller
             'content'   => 'required',
         ]);
 
-        //check if validation fails
+        // cek jika validasi gagal
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
@@ -87,5 +87,16 @@ class PostController extends Controller
         }
 
         return new PostResource(true, "Data berhasil di update", $post);
+    }
+
+    public function destroy(Post $post){
+        // hapus gambar
+        Storage::delete('public/posts/' . $post->image);
+
+        // hapus post
+        $post->delete();
+
+        // kembalikan response
+        return new PostResource(true, "Data berhasil dihapus", null);
     }
 }
